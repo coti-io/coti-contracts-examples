@@ -20,7 +20,10 @@ const config: HardhatUserConfig = {
       url: "https://testnet.coti.io/rpc",
       chainId: 7082400,
     },
-  }
+  },
+  mocha: {
+    timeout: 100000000
+  },
 }
 
 export default config;
