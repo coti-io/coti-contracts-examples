@@ -38,6 +38,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.PrivateERC721__factory>;
     getContractFactory(
+      name: "MpcCore",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MpcCore__factory>;
+    getContractFactory(
       name: "ExtendedOperations",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ExtendedOperations__factory>;
@@ -105,34 +109,6 @@ declare module "hardhat/types/runtime" {
       name: "PrivateToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.PrivateToken__factory>;
-    getContractFactory(
-      name: "DataPrivacyFramework",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.DataPrivacyFramework__factory>;
-    getContractFactory(
-      name: "DataPrivacyFrameworkMpc",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.DataPrivacyFrameworkMpc__factory>;
-    getContractFactory(
-      name: "IPrivateERC20",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IPrivateERC20__factory>;
-    getContractFactory(
-      name: "PrivateERC20",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PrivateERC20__factory>;
-    getContractFactory(
-      name: "PrivateERC721URIStorage",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PrivateERC721URIStorage__factory>;
-    getContractFactory(
-      name: "PrivateERC721",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PrivateERC721__factory>;
-    getContractFactory(
-      name: "ExtendedOperations",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ExtendedOperations__factory>;
 
     getContractAt(
       name: "DataPrivacyFramework",
@@ -164,6 +140,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.PrivateERC721>;
+    getContractAt(
+      name: "MpcCore",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MpcCore>;
     getContractAt(
       name: "ExtendedOperations",
       address: string | ethers.Addressable,
@@ -249,41 +230,6 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.PrivateToken>;
-    getContractAt(
-      name: "DataPrivacyFramework",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.DataPrivacyFramework>;
-    getContractAt(
-      name: "DataPrivacyFrameworkMpc",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.DataPrivacyFrameworkMpc>;
-    getContractAt(
-      name: "IPrivateERC20",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IPrivateERC20>;
-    getContractAt(
-      name: "PrivateERC20",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.PrivateERC20>;
-    getContractAt(
-      name: "PrivateERC721URIStorage",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.PrivateERC721URIStorage>;
-    getContractAt(
-      name: "PrivateERC721",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.PrivateERC721>;
-    getContractAt(
-      name: "ExtendedOperations",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ExtendedOperations>;
 
     deployContract(
       name: "DataPrivacyFramework",
@@ -309,6 +255,10 @@ declare module "hardhat/types/runtime" {
       name: "PrivateERC721",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.PrivateERC721>;
+    deployContract(
+      name: "MpcCore",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MpcCore>;
     deployContract(
       name: "ExtendedOperations",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -377,34 +327,6 @@ declare module "hardhat/types/runtime" {
       name: "PrivateToken",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.PrivateToken>;
-    deployContract(
-      name: "DataPrivacyFramework",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.DataPrivacyFramework>;
-    deployContract(
-      name: "DataPrivacyFrameworkMpc",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.DataPrivacyFrameworkMpc>;
-    deployContract(
-      name: "IPrivateERC20",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IPrivateERC20>;
-    deployContract(
-      name: "PrivateERC20",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.PrivateERC20>;
-    deployContract(
-      name: "PrivateERC721URIStorage",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.PrivateERC721URIStorage>;
-    deployContract(
-      name: "PrivateERC721",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.PrivateERC721>;
-    deployContract(
-      name: "ExtendedOperations",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ExtendedOperations>;
 
     deployContract(
       name: "DataPrivacyFramework",
@@ -436,6 +358,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.PrivateERC721>;
+    deployContract(
+      name: "MpcCore",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MpcCore>;
     deployContract(
       name: "ExtendedOperations",
       args: any[],
@@ -521,41 +448,6 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.PrivateToken>;
-    deployContract(
-      name: "DataPrivacyFramework",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.DataPrivacyFramework>;
-    deployContract(
-      name: "DataPrivacyFrameworkMpc",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.DataPrivacyFrameworkMpc>;
-    deployContract(
-      name: "IPrivateERC20",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IPrivateERC20>;
-    deployContract(
-      name: "PrivateERC20",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.PrivateERC20>;
-    deployContract(
-      name: "PrivateERC721URIStorage",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.PrivateERC721URIStorage>;
-    deployContract(
-      name: "PrivateERC721",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.PrivateERC721>;
-    deployContract(
-      name: "ExtendedOperations",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ExtendedOperations>;
 
     // default types
     getContractFactory(

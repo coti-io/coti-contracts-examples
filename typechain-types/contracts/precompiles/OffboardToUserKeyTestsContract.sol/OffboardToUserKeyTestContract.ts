@@ -28,7 +28,7 @@ export interface OffboardToUserKeyTestContractInterface extends Interface {
     nameOrSignature:
       | "getCTs"
       | "getCt"
-      | "getUserKey"
+      | "getUserKeyShares"
       | "getUserKeyTest"
       | "getX"
       | "offboardToUserTest"
@@ -40,7 +40,7 @@ export interface OffboardToUserKeyTestContractInterface extends Interface {
   encodeFunctionData(functionFragment: "getCTs", values?: undefined): string;
   encodeFunctionData(functionFragment: "getCt", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "getUserKey",
+    functionFragment: "getUserKeyShares",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -59,7 +59,10 @@ export interface OffboardToUserKeyTestContractInterface extends Interface {
 
   decodeFunctionResult(functionFragment: "getCTs", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getCt", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getUserKey", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getUserKeyShares",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getUserKeyTest",
     data: BytesLike
@@ -135,7 +138,7 @@ export interface OffboardToUserKeyTestContract extends BaseContract {
 
   getCt: TypedContractMethod<[], [bigint], "view">;
 
-  getUserKey: TypedContractMethod<[], [string], "view">;
+  getUserKeyShares: TypedContractMethod<[], [[string, string]], "view">;
 
   getUserKeyTest: TypedContractMethod<
     [signedEK: BytesLike, signature: BytesLike, addr: AddressLike],
@@ -153,7 +156,7 @@ export interface OffboardToUserKeyTestContract extends BaseContract {
 
   userKeyTest: TypedContractMethod<
     [signedEK: BytesLike, signature: BytesLike],
-    [void],
+    [[string, string]],
     "nonpayable"
   >;
 
@@ -168,8 +171,8 @@ export interface OffboardToUserKeyTestContract extends BaseContract {
     nameOrSignature: "getCt"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "getUserKey"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: "getUserKeyShares"
+  ): TypedContractMethod<[], [[string, string]], "view">;
   getFunction(
     nameOrSignature: "getUserKeyTest"
   ): TypedContractMethod<
@@ -191,7 +194,7 @@ export interface OffboardToUserKeyTestContract extends BaseContract {
     nameOrSignature: "userKeyTest"
   ): TypedContractMethod<
     [signedEK: BytesLike, signature: BytesLike],
-    [void],
+    [[string, string]],
     "nonpayable"
   >;
 

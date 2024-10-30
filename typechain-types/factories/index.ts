@@ -4,4 +4,3 @@
 export * as cotiIo from "./@coti-io";
 export * as openzeppelin from "./@openzeppelin";
 export * as contracts from "./contracts";
-export * as cotiContracts from "./coti-contracts";

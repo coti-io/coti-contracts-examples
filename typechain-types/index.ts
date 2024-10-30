@@ -7,8 +7,6 @@ import type * as openzeppelin from "./@openzeppelin";
 export type { openzeppelin };
 import type * as contracts from "./contracts";
 export type { contracts };
-import type * as cotiContracts from "./coti-contracts";
-export type { cotiContracts };
 export * as factories from "./factories";
 export type { DataPrivacyFramework } from "./@coti-io/coti-contracts/contracts/access/DataPrivacyFramework/DataPrivacyFramework";
 export { DataPrivacyFramework__factory } from "./factories/@coti-io/coti-contracts/contracts/access/DataPrivacyFramework/DataPrivacyFramework__factory";
@@ -22,6 +20,8 @@ export type { PrivateERC721URIStorage } from "./@coti-io/coti-contracts/contract
 export { PrivateERC721URIStorage__factory } from "./factories/@coti-io/coti-contracts/contracts/token/PrivateERC721/extensions/PrivateERC721URIStorage__factory";
 export type { PrivateERC721 } from "./@coti-io/coti-contracts/contracts/token/PrivateERC721/PrivateERC721";
 export { PrivateERC721__factory } from "./factories/@coti-io/coti-contracts/contracts/token/PrivateERC721/PrivateERC721__factory";
+export type { MpcCore } from "./@coti-io/coti-contracts/contracts/utils/mpc/MpcCore";
+export { MpcCore__factory } from "./factories/@coti-io/coti-contracts/contracts/utils/mpc/MpcCore__factory";
 export type { ExtendedOperations } from "./@coti-io/coti-contracts/contracts/utils/mpc/MpcInterface.sol/ExtendedOperations";
 export { ExtendedOperations__factory } from "./factories/@coti-io/coti-contracts/contracts/utils/mpc/MpcInterface.sol/ExtendedOperations__factory";
 export type { Ownable } from "./@openzeppelin/contracts/access/Ownable";
