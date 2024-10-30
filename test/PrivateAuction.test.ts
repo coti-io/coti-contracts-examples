@@ -1,6 +1,6 @@
 import hre from "hardhat"
 import { expect } from "chai"
-import { type ConfidentialAccount, decryptUint, buildInputText } from "@coti-io/coti-sdk-typescript"
+import { itUint, Wallet } from "@coti-io/coti-ethers"
 import { setupAccounts } from "./utils/accounts"
 
 const gasLimit = 12000000
@@ -11,21 +11,21 @@ async function deploy() {
   const tokenContract = await hre.ethers.getContractFactory("PrivateToken")
   const { name, symbol, initialSupply } = { name: "My Private Token", symbol: "PTOK", initialSupply: 500000000n } as const
   const token = await tokenContract
-    .connect(owner.wallet)
-    .deploy(name, symbol, { gasLimit, from: owner.wallet.address })
+    .connect(owner)
+    .deploy(name, symbol, { gasLimit, from: owner.address })
 
   await token.waitForDeployment()
 
   await (
     await token
-      .connect(owner.wallet)
-      .mint(owner.wallet.address, initialSupply)
+      .connect(owner)
+      .mint(owner.address, initialSupply)
   ).wait()
 
   const factory = await hre.ethers.getContractFactory("PrivateAuction")
   const contract = await factory
-    .connect(owner.wallet)
-    .deploy(otherAccount.wallet.address, await token.getAddress(), 60 * 60 * 24, true, { gasLimit })
+    .connect(owner)
+    .deploy(otherAccount.address, await token.getAddress(), 60 * 60 * 24, true, { gasLimit })
 
   await contract.waitForDeployment()
 
@@ -42,20 +42,20 @@ async function deploy() {
 async function expectBalance(
   token: Awaited<ReturnType<typeof deploy>>["token"],
   amount: number,
-  user: ConfidentialAccount
+  user: Wallet
 ) {
-  const ctBalance = await token["balanceOf(address)"](user.wallet.address)
-  let balance = decryptUint(ctBalance, user.userKey)
+  const ctBalance = await token["balanceOf(address)"](user.address)
+  let balance = await user.decryptValue(ctBalance)
   expect(balance).to.equal(amount)
 }
 
 async function expectBid(
   contract: Awaited<ReturnType<typeof deploy>>["contract"],
   amount: number,
-  user: ConfidentialAccount
+  user: Wallet
 ) {
-  const ctBalance = await contract.connect(user.wallet).getBid.staticCall()
-  let bid = decryptUint(ctBalance, user.userKey)
+  const ctBalance = await contract.connect(user).getBid.staticCall()
+  let bid = await user.decryptValue(ctBalance)
   expect(bid).to.equal(amount)
 }
 
@@ -80,11 +80,11 @@ describe("Private Auction", function () {
     })
 
     it("Function 'contractOwner' should be correct", async function () {
-      expect(await deployment.contract.contractOwner()).to.equal(deployment.owner.wallet.address)
+      expect(await deployment.contract.contractOwner()).to.equal(deployment.owner.address)
     })
 
     it("Function 'beneficiary' should be correct", async function () {
-      expect(await deployment.contract.beneficiary()).to.equal(deployment.otherAccount.wallet.address)
+      expect(await deployment.contract.beneficiary()).to.equal(deployment.otherAccount.address)
     })
   })
 
@@ -93,24 +93,24 @@ describe("Private Auction", function () {
     it(`Bid ${bidAmount}`, async function () {
       const { token, tokenAddress, contract, contractAddress, owner } = deployment
 
-      const initialBalance = Number(decryptUint(await token["balanceOf(address)"](owner.wallet.address), owner.userKey))
+      const initialBalance = Number(await owner.decryptValue(await token["balanceOf(address)"](owner.address)))
 
-      let itBidAmount = owner.encryptUint(
+      let itBidAmount = await owner.encryptValue(
         bidAmount,
         tokenAddress,
         token["approve(address,(uint256,bytes))"].fragment.selector
-      )
+      ) as itUint
 
       await (
         await token
-          .connect(owner.wallet)
+          .connect(owner)
           ["approve(address,(uint256,bytes))"]
           (contractAddress, itBidAmount, { gasLimit })
       ).wait()
 
-      const func = contract.connect(owner.wallet).bid
+      const func = contract.connect(owner).bid
       const selector = func.fragment.selector
-      itBidAmount = await buildInputText(BigInt(bidAmount), owner, contractAddress, selector)
+      itBidAmount = await owner.encryptValue(BigInt(bidAmount), contractAddress, selector) as itUint
       await (await func(itBidAmount, { gasLimit })).wait()
 
       await expectBalance(token, initialBalance - bidAmount, owner)
@@ -121,24 +121,24 @@ describe("Private Auction", function () {
     it(`Increase Bid ${bidAmount * 2}`, async function () {
       const { token, tokenAddress, contract, contractAddress, owner } = deployment
 
-      const initialBalance = Number(decryptUint(await token["balanceOf(address)"](owner.wallet.address), owner.userKey))
+      const initialBalance = Number(await owner.decryptValue(await token["balanceOf(address)"](owner.address)))
 
-      let itBidAmount = owner.encryptUint(
+      let itBidAmount = await owner.encryptValue(
         bidAmount * 2,
         tokenAddress,
         token["approve(address,(uint256,bytes))"].fragment.selector
-      )
+      ) as itUint
 
       await (
         await token
-          .connect(owner.wallet)
+          .connect(owner)
           ["approve(address,(uint256,bytes))"]
           (contractAddress, itBidAmount, { gasLimit })
       ).wait()
 
-      const func = contract.connect(owner.wallet).bid
+      const func = contract.connect(owner).bid
       const selector = func.fragment.selector
-      itBidAmount = await buildInputText(BigInt(bidAmount * 2), owner, contractAddress, selector)
+      itBidAmount = await owner.encryptValue(BigInt(bidAmount * 2), contractAddress, selector) as itUint
       await (await func(itBidAmount, { gasLimit })).wait()
 
       await expectBalance(token, initialBalance - bidAmount, owner)
@@ -149,13 +149,13 @@ describe("Private Auction", function () {
     it(`Winner`, async function () {
       const { contract, owner } = deployment
 
-      await (await contract.connect(owner.wallet).stop({ gasLimit })).wait()
+      await (await contract.connect(owner).stop({ gasLimit })).wait()
 
-      const receipt = await (await contract.connect(owner.wallet).doIHaveHighestBid({ gasLimit })).wait()
+      const receipt = await (await contract.connect(owner).doIHaveHighestBid({ gasLimit })).wait()
 
       const ctBool = (receipt!.logs[0] as any).args[0]
 
-      let isHighestBid = decryptUint(ctBool, owner.userKey)
+      let isHighestBid = await owner.decryptValue(ctBool)
       expect(isHighestBid).to.eq(1)
     })
   })

@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.19;
 
-import {PrivateERC721, PrivateERC721URIStorage} from "coti-contracts/contracts/token/PrivateERC721/extensions/PrivateERC721URIStorage.sol";
-import "coti-contracts/contracts/utils/mpc/MpcCore.sol";
+import {PrivateERC721, PrivateERC721URIStorage} from "@coti-io/coti-contracts/contracts/token/PrivateERC721/extensions/PrivateERC721URIStorage.sol";
+import "@coti-io/coti-contracts/contracts/utils/mpc/MpcCore.sol";
 
 contract PrivateNFT is PrivateERC721URIStorage {
     uint256 private _totalSupply;

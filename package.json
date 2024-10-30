@@ -1,6 +1,6 @@
 {
-  "name": "coti-contracts-examples",
-  "version": "1.0.0",
+  "name": "@coti-io/coti-contracts-examples",
+  "version": "0.0.1",
   "description": "",
   "scripts": {
     "precompile": "npx hardhat test ./test/Precompile.test.ts",
@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "coti-contracts": "https://github.com/coti-io/coti-contracts.git#12e70356000c0b910adbe1a7285cf9aaccb2650b",
+    "@coti-io/coti-contracts": "0.1.0",
     "hardhat": "^2.22.11"
   }
 }

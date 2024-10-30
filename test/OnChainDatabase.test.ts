@@ -4,6 +4,7 @@ import hre from "hardhat"
 import { expect } from "chai"
 import { setupAccounts } from "./utils/accounts"
 import { DataPrivacyFramework } from "../typechain-types"
+import { itUint } from "@coti-io/coti-ethers"
 
 async function deploy() {
   const [owner, otherAccount] = await setupAccounts()
@@ -11,7 +12,7 @@ async function deploy() {
   const OnChainDatabaseFactory = await hre.ethers.getContractFactory("OnChainDatabase")
 
   const onChainDatabase = await OnChainDatabaseFactory
-    .connect(owner.wallet)
+    .connect(owner)
     .deploy({ gasLimit: 15000000 })
 
   const contract = await onChainDatabase.waitForDeployment()
@@ -36,7 +37,7 @@ describe("On-chain Database", function () {
         it("'op_get_clear_coti_usd_price' should be an allowed operation", async function () {
             const { contract, otherAccount } = deployment
       
-            const isAllowed = await contract["isOperationAllowed(address,string)"](otherAccount.wallet, "op_get_clear_coti_usd_price")
+            const isAllowed = await contract["isOperationAllowed(address,string)"](otherAccount, "op_get_clear_coti_usd_price")
 
             expect(isAllowed).to.equal(true)
         })
@@ -47,14 +48,14 @@ describe("On-chain Database", function () {
             const { contract, otherAccount } = deployment
 
             const tx = await contract
-                .connect(otherAccount.wallet)
+                .connect(otherAccount)
                 .getItem("coti_usd_price", { gasLimit: 15000000 });
 
             const result = await tx.wait()
 
             const encryptedValue = result?.logs[0]['args'][1]
 
-            const decryptedValue = otherAccount.decryptUint(encryptedValue)
+            const decryptedValue = await otherAccount.decryptValue(encryptedValue)
 
             expect(decryptedValue).to.equal(5)
         })
@@ -63,7 +64,7 @@ describe("On-chain Database", function () {
             const { contract, otherAccount } = deployment
 
             const tx = await contract
-                .connect(otherAccount.wallet)
+                .connect(otherAccount)
                 .getClearOilUsdPrice({ gasLimit: 15000000 });
 
             const result = await tx.wait()
@@ -77,7 +78,7 @@ describe("On-chain Database", function () {
             const { contract, otherAccount } = deployment
 
             const tx = await contract
-                .connect(otherAccount.wallet)
+                .connect(otherAccount)
                 .getClearCotiUsdPrice({ gasLimit: 15000000 });
 
             const result = await tx.wait()
@@ -91,7 +92,7 @@ describe("On-chain Database", function () {
             const { contract, otherAccount } = deployment
 
             const tx = await contract
-                .connect(otherAccount.wallet)
+                .connect(otherAccount)
                 .getClearOilCotiPrice({ gasLimit: 15000000 });
 
             const result = await tx.wait()
@@ -105,7 +106,7 @@ describe("On-chain Database", function () {
             const { contract, owner } = deployment
 
             const tx = await contract
-                .connect(owner.wallet)
+                .connect(owner)
                 .getClearOilCotiPrice({ gasLimit: 15000000 });
 
             expect(tx).to.be.revertedWith("No Permission!")
@@ -116,14 +117,14 @@ describe("On-chain Database", function () {
         it("Should allow the owner to set a new value in the database", async function () {
             const { contract, contractAddress, owner } = deployment
 
-            const itValue = await owner.encryptUint(
+            const itValue = await owner.encryptValue(
                 123,
                 contractAddress,
                 contract.setItem.fragment.selector
-            )
+            ) as itUint
 
             const tx = await contract
-                .connect(owner.wallet)
+                .connect(owner)
                 .setItem("test_value", itValue, { gasLimit: 15000000 })
             
             await tx.wait()
@@ -133,14 +134,14 @@ describe("On-chain Database", function () {
             const { contract, otherAccount } = deployment
 
             const tx = await contract
-                .connect(otherAccount.wallet)
+                .connect(otherAccount)
                 .getItem("test_value", { gasLimit: 15000000 });
 
             const result = await tx.wait()
 
             const encryptedValue = result?.logs[0]['args'][1]
 
-            const decryptedValue = otherAccount.decryptUint(encryptedValue)
+            const decryptedValue = await otherAccount.decryptValue(encryptedValue)
 
             expect(decryptedValue).to.equal(123)
         })
@@ -159,7 +160,7 @@ describe("On-chain Database", function () {
                 falseKey: false,
                 trueKey: true,
                 uintParameter: "0",
-                addressParameter: owner.wallet,
+                addressParameter: owner,
                 stringParameter: ""
             }
 
@@ -167,7 +168,7 @@ describe("On-chain Database", function () {
       
             await tx.wait()
       
-            const isAllowed = await contract["isOperationAllowed(address,string)"](owner.wallet, "op_get_clear_coti_usd_price")
+            const isAllowed = await contract["isOperationAllowed(address,string)"](owner, "op_get_clear_coti_usd_price")
 
             expect(isAllowed).to.equal(false)
         })

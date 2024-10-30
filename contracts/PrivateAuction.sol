@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.19;
 
-import {PrivateERC20} from "coti-contracts/contracts/token/PrivateERC20/PrivateERC20.sol";
-import "coti-contracts/contracts/utils/mpc/MpcCore.sol";
+import {PrivateERC20} from "@coti-io/coti-contracts/contracts/token/PrivateERC20/PrivateERC20.sol";
+import "@coti-io/coti-contracts/contracts/utils/mpc/MpcCore.sol";
 
 contract PrivateAuction {
     uint public endTime;

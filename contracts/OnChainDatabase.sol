@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.19;
 
-import "coti-contracts/contracts/access/DataPrivacyFramework/extensions/DataPrivacyFrameworkMpc.sol";
+import "@coti-io/coti-contracts/contracts/access/DataPrivacyFramework/extensions/DataPrivacyFrameworkMpc.sol";
 
 contract OnChainDatabase is DataPrivacyFrameworkMpc {
 

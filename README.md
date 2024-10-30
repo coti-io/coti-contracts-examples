@@ -1,4 +1,4 @@
-# COTI V2 Confidentiality Preserving L2 | SDKs and Examples
+# COTI Contracts Examples
 
 All repositories specified below contain smart contracts that implement confidentiality features using the COTI V2 protocol.
 The contracts provide examples for various use cases, such as Non-Fungible Tokens (NFTs), ERC20 tokens, Auction, and Identity management.
@@ -6,35 +6,33 @@ The contracts provide examples for various use cases, such as Non-Fungible Token
 These contracts demonstrate how to leverage the confidentiality features of the COTI V2 protocol to enhance privacy and security in decentralized applications.
 The contracts are of Solidity and can be compiled and deployed using popular development tools like Hardhat and Foundry (Work in progress).
 
-#### Important Links:
+#### Important Links
 
-[Docs](https://docs.coti.io) | [Devnet Explorer](https://explorer-devnet.coti.io) | [Discord](https://discord.gg/cuCykh8P4m) | [Faucet](https://faucet.coti.io)
+[Docs](https://docs.coti.io) | [Discord](https://discord.gg/cuCykh8P4m) | [Faucet](https://faucet.coti.io)
+
+#### Network-Specific Links
+
+[Devnet Explorer](https://explorer-devnet.coti.io) | [Testnet Explorer](https://testnet.coti.io)
 
 Interact with the contract using any of the following:
 
 1. [Python SDK](https://github.com/coti-io/coti-sdk-python) | [Python SDK Examples](https://github.com/coti-io/coti-sdk-python-examples)
 2. [Typescript SDK](https://github.com/coti-io/coti-sdk-typescript) | [Typescript SDK Examples](https://github.com/coti-io/coti-sdk-typescript-examples)
-3. [COTI Smart Contract Library](https://github.com/coti-io/coti-contracts) | [COTI Smart Contract Examples](https://github.com/coti-io/coti-contracts-examples)
 
 The following contracts are available in each of the packages:
 
 | Contract                       |            | python sdk  | hardhat sdk | typescript sdk | Contract Description                                                                                                                          |
 |--------------------------------|------------|-------------|-------------|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-| `AccountOnboard`               | deployment | ✅ *        | ✅           | ❌              | Onboard a EOA account - During onboard network creates AES unique for that EOA which is used for decrypting values sent back from the network |
-| `AccountOnboard`               | execution  | ✅          | ✅           | ✅              | "                                                                                                                                             |
-| `ERC20Example`                 | deployment | ✅          | ✅           | ❌              | Confidential ERC20 - deploy and transfer encrypted amount of funds                                                                            |
-| `ERC20Example`                 | execution  | ✅          | ✅           | ✅              | "                                                                                                                                             |
-| `NFTExample`                   | deployment | ❌          | ✅           | ❌              | Confidential NFT example - saving encrypted data                                                                                              |
-| `NFTExample`                   | execution  | ❌          | ✅           | ❌              | "                                                                                                                                             |
-| `ConfidentialAuction`          | deployment | ❌          | ✅           | ❌              | Confidential auction - encrypted bid amount                                                                                                   |
-| `ConfidentialAuction`          | execution  | ❌          | ✅           | ❌              | "                                                                                                                                             |
-| `ConfidentialIdentityRegistry` | deployment | ❌          | ✅           | ❌              | Confidential Identity Registry - Encrypted identity data                                                                                      |
-| `ConfidentialIdentityRegistry` | execution  | ❌          | ✅           | ❌              | "                                                                                                                                             |
-| `DataOnChain`                  | deployment | ✅          | ❌           | ❌              | Basic encryption and decryption - Good place to start explorining network capabilties                                                         |
+| `PrivateToken`                 | deployment | ✅          | ✅           | ❌              | Confidential ERC20 - deploy and transfer encrypted amount of funds                                                                            |
+| `PrivateToken`                 | execution  | ✅          | ✅           | ✅              | "                                                                                                                                             |
+| `PrivateNFT`                   | deployment | ❌          | ✅           | ❌              | Confidential NFT example - saving encrypted data                                                                                              |
+| `PrivateNFT`                   | execution  | ❌          | ✅           | ❌              | "                                                                                                                                             |
+| `PrivateAuction`          | deployment | ❌          | ✅           | ❌              | Confidential auction - encrypted bid amount                                                                                                   |
+| `PrivateAuction`          | execution  | ❌          | ✅           | ❌              | "                                                                                                                                             |
+| `PrivateIdentityRegistry` | deployment | ❌          | ✅           | ❌              | Confidential Identity Registry - Encrypted identity data                                                                                      |
+| `PrivateIdentityRegistry` | execution  | ❌          | ✅           | ❌              | "                                                                                                                                             |
+| `DataOnChain`                  | deployment | ✅          | ❌           | ❌              | Basic encryption and decryption - Good place to start exploring network capabilties                                                         |
 | `DataOnChain`                  | execution  | ✅          | ❌           | ✅              | "                                                                                                                                             |
-| `Precompile`                   | deployment | ✅          | ✅           | ❌              | Thorough examples of the precompile functionality                                                                                             |
-| `Precompile`                   | execution  | ✅          | ✅           | ❌              | "                                                                                                                                             |-              |              
-
 (*) no deployment needed (system contract)
 
 > [!NOTE]  
@@ -56,12 +54,11 @@ The following example contracts are available for Hardhat Runtime Environment fo
 
 | Contract                     | Contract Description                                                                                                                          |
 |------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-| AccountOnboard               | Onboard a EOA account - During onboard network creates AES unique for that EOA which is used for decrypting values sent back from the network |
-| ERC20Example                 | Confidential ERC20 - deploy and transfer encrypted amount of funds                                                                            |
-| NFTExample                   | Confidential NFT example - saving encrypted data                                                                                              |
-| ConfidentialAuction          | Confidential auction - encrypted bid amount                                                                                                   |
-| ConfidentialIdentityRegistry | Confidential Identity Registry - Encrypted identity data                                                                                      |
-| Precompile                   | Thorough examples of the precompile functionality                                                                                             |
+| PrivateToken                 | Confidential ERC20 - deploy and transfer encrypted amount of funds                                                                            |
+| PrivateNFT                   | Confidential NFT example - saving encrypted data                                                                                              |
+| PrivateAuction               | Confidential auction - encrypted bid amount                                                                                                   |
+| PrivateIdentityRegistry      | Confidential Identity Registry - Encrypted identity data                                                                                      |
+| DataOnChain                  | Basic encryption and decryption                                                                                                               |
 
 ## Usage
 

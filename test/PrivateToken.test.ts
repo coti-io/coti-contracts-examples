@@ -1,9 +1,9 @@
-import hre, { ethers } from "hardhat"
+import hre from "hardhat"
 import { expect } from "chai"
 
 import { setupAccounts } from "./utils/accounts"
 import { PrivateToken } from "../typechain-types"
-import { ConfidentialAccount } from "@coti-io/coti-sdk-typescript"
+import { itUint, Wallet, ZeroAddress } from "@coti-io/coti-ethers"
 
 const GAS_LIMIT = 12000000
 
@@ -13,7 +13,7 @@ async function deploy() {
     const tokenContract = await hre.ethers.getContractFactory("PrivateToken")
 
     const token = await tokenContract
-        .connect(owner.wallet)
+        .connect(owner)
         .deploy("Private Token", "PTOK", { gasLimit: GAS_LIMIT })
 
     const contract = await token.waitForDeployment()
@@ -29,8 +29,8 @@ async function deploy() {
 describe("Private Token", function () {
     let contract: PrivateToken
     let contractAddress: string
-    let owner: ConfidentialAccount
-    let otherAccount: ConfidentialAccount
+    let owner: Wallet
+    let otherAccount: Wallet
 
     before(async function () {
         const deployment = await deploy()
@@ -61,8 +61,8 @@ describe("Private Token", function () {
         describe("successful mint", async function () {
             before("minting", async function () {
                 this.tx = await contract
-                    .connect(owner.wallet)
-                    .mint(owner.wallet.address, value, { gasLimit: GAS_LIMIT })
+                    .connect(owner)
+                    .mint(owner.address, value, { gasLimit: GAS_LIMIT })
                 
                 await this.tx.wait()
             })
@@ -72,9 +72,9 @@ describe("Private Token", function () {
             })
             
             it('increments recipient balance', async function () {
-                const ctBalance = await contract["balanceOf(address)"](owner.wallet.address)
+                const ctBalance = await contract["balanceOf(address)"](owner.address)
                 
-                const balance = owner.decryptUint(ctBalance)
+                const balance = await owner.decryptValue(ctBalance)
                 
                 await expect(balance).to.equal(value)
             })
@@ -88,11 +88,11 @@ describe("Private Token", function () {
             it('rejects minting to the zero address', async function () {
                 await expect(
                     contract
-                        .connect(owner.wallet)
-                        .mint(ethers.ZeroAddress, value)
+                        .connect(owner)
+                        .mint(ZeroAddress, value)
                     )
                     .to.be.revertedWithCustomError(contract, "ERC20InvalidReceiver")
-                    .withArgs(ethers.ZeroAddress)
+                    .withArgs(ZeroAddress)
             })
         })
     })
@@ -104,23 +104,23 @@ describe("Private Token", function () {
             it('rejects burning from the zero address', async function () {
                 await expect(
                     contract
-                        .connect(owner.wallet)
-                        .burn(ethers.ZeroAddress, value)
+                        .connect(owner)
+                        .burn(ZeroAddress, value)
                     )
                     .to.be.revertedWithCustomError(contract, "ERC20InvalidSender")
-                    .withArgs(ethers.ZeroAddress)
+                    .withArgs(ZeroAddress)
             })
 
             it('does not update balance when burning more than balance', async function () {
                 const tx = await contract
-                    .connect(owner.wallet)
-                    .burn(owner.wallet.address, value + 1n, { gasLimit: GAS_LIMIT })
+                    .connect(owner)
+                    .burn(owner.address, value + 1n, { gasLimit: GAS_LIMIT })
                 
                 await tx.wait()
                 
-                const ctBalance = await contract["balanceOf(address)"](owner.wallet.address)
+                const ctBalance = await contract["balanceOf(address)"](owner.address)
 
-                const balance = owner.decryptUint(ctBalance)
+                const balance = await owner.decryptValue(ctBalance)
     
                 await expect(balance).to.equal(value)
             })
@@ -129,16 +129,16 @@ describe("Private Token", function () {
         describe('successful burn', async function () {
             before("burning", async function () {
                 this.tx = await contract
-                    .connect(owner.wallet)
-                    .burn(owner.wallet.address, value, { gasLimit: GAS_LIMIT })
+                    .connect(owner)
+                    .burn(owner.address, value, { gasLimit: GAS_LIMIT })
                 
                 await this.tx.wait()
             })
 
             it('decrements the senders balance', async function () {
-                const ctBalance = await contract["balanceOf(address)"](owner.wallet.address)
+                const ctBalance = await contract["balanceOf(address)"](owner.address)
 
-                const balance = owner.decryptUint(ctBalance)
+                const balance = await owner.decryptValue(ctBalance)
     
                 await expect(balance).to.equal(0n)
             })
@@ -154,45 +154,45 @@ describe("Private Token", function () {
 
         before("minting", async function () {
             this.tx = await contract
-                .connect(owner.wallet)
-                .mint(owner.wallet.address, value, { gasLimit: GAS_LIMIT })
+                .connect(owner)
+                .mint(owner.address, value, { gasLimit: GAS_LIMIT })
             
             await this.tx.wait()
         })
 
         describe("failed transfer", async function () {
             it('rejects transferring to the zero address', async function () {
-                const itValue = owner.encryptUint(value, contractAddress, contract["transfer(address,(uint256,bytes))"].fragment.selector)
+                const itValue = await owner.encryptValue(value, contractAddress, contract["transfer(address,(uint256,bytes))"].fragment.selector) as itUint
     
                 await expect(
                     contract
-                        .connect(owner.wallet)
+                        .connect(owner)
                         ["transfer(address,(uint256,bytes))"]
-                        (ethers.ZeroAddress, itValue)
+                        (ZeroAddress, itValue)
                     )
                     .to.be.revertedWithCustomError(contract, "ERC20InvalidReceiver")
-                    .withArgs(ethers.ZeroAddress)
+                    .withArgs(ZeroAddress)
             })
 
             it('does not transfer tokens when amount exceeds balance', async function () {
-                const itValue = owner.encryptUint(value + 1n, contractAddress, contract["transfer(address,(uint256,bytes))"].fragment.selector)
+                const itValue = await owner.encryptValue(value + 1n, contractAddress, contract["transfer(address,(uint256,bytes))"].fragment.selector) as itUint
 
                 const tx = await contract
-                    .connect(owner.wallet)
+                    .connect(owner)
                     ["transfer(address,(uint256,bytes))"]
-                    (otherAccount.wallet.address, itValue, { gasLimit: GAS_LIMIT })
+                    (otherAccount.address, itValue, { gasLimit: GAS_LIMIT })
                 
                 await tx.wait()
 
-                let ctBalance = await contract["balanceOf(address)"](owner.wallet.address)
+                let ctBalance = await contract["balanceOf(address)"](owner.address)
 
-                let balance = owner.decryptUint(ctBalance)
+                let balance = await owner.decryptValue(ctBalance)
     
                 await expect(balance).to.equal(value)
 
-                ctBalance = await contract["balanceOf(address)"](otherAccount.wallet.address)
+                ctBalance = await contract["balanceOf(address)"](otherAccount.address)
 
-                balance = otherAccount.decryptUint(ctBalance)
+                balance = await otherAccount.decryptValue(ctBalance)
     
                 await expect(balance).to.equal(0n)
             })
@@ -200,28 +200,28 @@ describe("Private Token", function () {
 
         describe("successful transfer", async function () {
             before("transferring", async function () {
-                const itValue = owner.encryptUint(value / 2n, contractAddress, contract["transfer(address,(uint256,bytes))"].fragment.selector)
+                const itValue = await owner.encryptValue(value / 2n, contractAddress, contract["transfer(address,(uint256,bytes))"].fragment.selector) as itUint
 
                 const tx = await contract
-                    .connect(owner.wallet)
+                    .connect(owner)
                     ["transfer(address,(uint256,bytes))"]
-                    (otherAccount.wallet.address, itValue, { gasLimit: GAS_LIMIT })
+                    (otherAccount.address, itValue, { gasLimit: GAS_LIMIT })
                 
                 await tx.wait()
             })
 
             it('decrements the senders balance', async function () {
-                const ctBalance = await contract["balanceOf(address)"](owner.wallet.address)
+                const ctBalance = await contract["balanceOf(address)"](owner.address)
 
-                const balance = owner.decryptUint(ctBalance)
+                const balance = await owner.decryptValue(ctBalance)
     
                 await expect(balance).to.equal(value / 2n)
             })
 
             it('increments the receivers balance', async function () {
-                const ctBalance = await contract["balanceOf(address)"](otherAccount.wallet.address)
+                const ctBalance = await contract["balanceOf(address)"](otherAccount.address)
 
-                const balance = otherAccount.decryptUint(ctBalance)
+                const balance = await otherAccount.decryptValue(ctBalance)
     
                 await expect(balance).to.equal(value / 2n)
             })
@@ -233,27 +233,27 @@ describe("Private Token", function () {
 
         describe("failed approval", async function () {
             it('rejects when approving the zero address', async function () {
-                const itValue = owner.encryptUint(value, contractAddress, contract["transfer(address,(uint256,bytes))"].fragment.selector)
+                const itValue = await owner.encryptValue(value, contractAddress, contract["transfer(address,(uint256,bytes))"].fragment.selector) as itUint
     
                 await expect(
                     contract
-                        .connect(owner.wallet)
+                        .connect(owner)
                         ["approve(address,(uint256,bytes))"]
-                        (ethers.ZeroAddress, itValue)
+                        (ZeroAddress, itValue)
                     )
                     .to.be.revertedWithCustomError(contract, "ERC20InvalidSpender")
-                    .withArgs(ethers.ZeroAddress)
+                    .withArgs(ZeroAddress)
             })
         })
 
         describe("successful approval", async function () {
             before('approving', async function () {
-                const itValue = owner.encryptUint(value, contractAddress, contract["approve(address,(uint256,bytes))"].fragment.selector)
+                const itValue = await owner.encryptValue(value, contractAddress, contract["approve(address,(uint256,bytes))"].fragment.selector) as itUint
 
                 const tx = await contract
-                    .connect(owner.wallet)
+                    .connect(owner)
                     ["approve(address,(uint256,bytes))"]
-                    (otherAccount.wallet.address, itValue, { gasLimit: GAS_LIMIT })
+                    (otherAccount.address, itValue, { gasLimit: GAS_LIMIT })
     
                 await tx.wait()
             })
@@ -261,9 +261,9 @@ describe("Private Token", function () {
             it('increment the allowance encrypted with the owners key', async function () {
                 const ctAllowance = await contract
                     ["allowance(address,address)"]
-                    (owner.wallet.address, otherAccount.wallet.address)
+                    (owner.address, otherAccount.address)
                 
-                const allowance = owner.decryptUint(ctAllowance[1])
+                const allowance = await owner.decryptValue(ctAllowance[1])
 
                 await expect(allowance).to.equal(value)
             })
@@ -271,9 +271,9 @@ describe("Private Token", function () {
             it('increment the allowance encrypted with the spenders key', async function () {
                 const ctAllowance = await contract
                     ["allowance(address,address)"]
-                    (owner.wallet.address, otherAccount.wallet.address)
+                    (owner.address, otherAccount.address)
                 
-                const allowance = otherAccount.decryptUint(ctAllowance[2])
+                const allowance = await otherAccount.decryptValue(ctAllowance[2])
 
                 await expect(allowance).to.equal(value)
             })
@@ -285,42 +285,42 @@ describe("Private Token", function () {
 
         describe('failed transferFrom', async function () {
             it('rejects transferring to the zero address', async function () {
-                const itValue = otherAccount.encryptUint(value, contractAddress, contract["transferFrom(address,address,(uint256,bytes))"].fragment.selector)
+                const itValue = await otherAccount.encryptValue(value, contractAddress, contract["transferFrom(address,address,(uint256,bytes))"].fragment.selector) as itUint
     
                 await expect(
                     contract
-                        .connect(otherAccount.wallet)
+                        .connect(otherAccount)
                         ["transferFrom(address,address,(uint256,bytes))"]
-                        (owner.wallet.address, ethers.ZeroAddress, itValue)
+                        (owner.address, ZeroAddress, itValue)
                     )
                     .to.be.revertedWithCustomError(contract, "ERC20InvalidReceiver")
-                    .withArgs(ethers.ZeroAddress)
+                    .withArgs(ZeroAddress)
             })
 
             describe("transferring more than the owners balance", async function () {
                 before("transferring", async function () {
-                    const itValue = otherAccount.encryptUint(2n * value, contractAddress, contract["transferFrom(address,address,(uint256,bytes))"].fragment.selector)
+                    const itValue = await otherAccount.encryptValue(2n * value, contractAddress, contract["transferFrom(address,address,(uint256,bytes))"].fragment.selector) as itUint
 
                     const tx = await contract
-                        .connect(otherAccount.wallet)
+                        .connect(otherAccount)
                         ["transferFrom(address,address,(uint256,bytes))"]
-                        (owner.wallet.address, "0x0000000000000000000000000000000000000001", itValue)
+                        (owner.address, "0x0000000000000000000000000000000000000001", itValue)
                     
                     await tx.wait()
                 })
 
                 it("does not decrement the owners balance", async function () {
-                    const ctBalance = await contract["balanceOf(address)"](owner.wallet.address)
+                    const ctBalance = await contract["balanceOf(address)"](owner.address)
 
-                    const balance = owner.decryptUint(ctBalance)
+                    const balance = await owner.decryptValue(ctBalance)
         
                     await expect(balance).to.equal(5000n)
                 })
 
                 it("does not decrement the spenders allowance", async function () {
-                    const ctAllowance = await contract["allowance(address,address)"](owner.wallet.address, otherAccount.wallet.address)
+                    const ctAllowance = await contract["allowance(address,address)"](owner.address, otherAccount.address)
 
-                    const allowance = owner.decryptUint(ctAllowance[1])
+                    const allowance = await owner.decryptValue(ctAllowance[1])
         
                     await expect(allowance).to.equal(5000n)
                 })
@@ -329,36 +329,36 @@ describe("Private Token", function () {
 
         describe('successful transferFrom', async function () {
             before('transferring', async function () {
-                const itValue = otherAccount.encryptUint(value, contractAddress, contract["transferFrom(address,address,(uint256,bytes))"].fragment.selector)
+                const itValue = await otherAccount.encryptValue(value, contractAddress, contract["transferFrom(address,address,(uint256,bytes))"].fragment.selector) as itUint
 
                 const tx = await contract
-                    .connect(otherAccount.wallet)
+                    .connect(otherAccount)
                     ["transferFrom(address,address,(uint256,bytes))"]
-                    (owner.wallet.address, otherAccount.wallet.address, itValue)
+                    (owner.address, otherAccount.address, itValue)
                 
                 await tx.wait()
             })
 
             it('decrement the owners balance', async function () {
-                const ctBalance = await contract["balanceOf(address)"](owner.wallet.address)
+                const ctBalance = await contract["balanceOf(address)"](owner.address)
 
-                const balance = owner.decryptUint(ctBalance)
+                const balance = await owner.decryptValue(ctBalance)
     
                 await expect(balance).to.equal(2000n)
             })
 
             it('increment the recipients balance', async function () {
-                const ctBalance = await contract["balanceOf(address)"](otherAccount.wallet.address)
+                const ctBalance = await contract["balanceOf(address)"](otherAccount.address)
 
-                const balance = otherAccount.decryptUint(ctBalance)
+                const balance = await otherAccount.decryptValue(ctBalance)
     
                 await expect(balance).to.equal(8000n)
             })
 
             it('decrement the spenders allowance', async function () {
-                const ctAllowance = await contract["allowance(address,address)"](owner.wallet.address, otherAccount.wallet.address)
+                const ctAllowance = await contract["allowance(address,address)"](owner.address, otherAccount.address)
 
-                const allowance = otherAccount.decryptUint(ctAllowance[2])
+                const allowance = await otherAccount.decryptValue(ctAllowance[2])
     
                 await expect(allowance).to.equal(2000n)
             })
@@ -369,37 +369,37 @@ describe("Private Token", function () {
         const value = (2n ** 64n) - 1n
 
         before("transferring", async function () {
-            let itValue = owner.encryptUint(value, contractAddress, contract["approve(address,(uint256,bytes))"].fragment.selector)
+            let itValue = await owner.encryptValue(value, contractAddress, contract["approve(address,(uint256,bytes))"].fragment.selector) as itUint
 
             let tx = await contract
-                .connect(owner.wallet)
+                .connect(owner)
                 ["approve(address,(uint256,bytes))"]
-                (otherAccount.wallet.address, itValue)
+                (otherAccount.address, itValue)
             
             await tx.wait()
 
-            itValue = otherAccount.encryptUint(7000n, contractAddress, contract["transferFrom(address,address,(uint256,bytes))"].fragment.selector)
+            itValue = await otherAccount.encryptValue(7000n, contractAddress, contract["transferFrom(address,address,(uint256,bytes))"].fragment.selector) as itUint
 
             tx = await contract
-                .connect(otherAccount.wallet)
+                .connect(otherAccount)
                 ["transferFrom(address,address,(uint256,bytes))"]
-                (owner.wallet.address, "0x0000000000000000000000000000000000000001", itValue)
+                (owner.address, "0x0000000000000000000000000000000000000001", itValue)
             
             await tx.wait()
         })
 
         it("decrement the owners balance", async function () {
-            const ctBalance = await contract["balanceOf(address)"](owner.wallet.address)
+            const ctBalance = await contract["balanceOf(address)"](owner.address)
 
-            const balance = owner.decryptUint(ctBalance)
+            const balance = await owner.decryptValue(ctBalance)
 
             await expect(balance).to.equal(2000n)
         })
 
         it("does not decrement the spenders allowance", async function () {
-            const ctAllowance = await contract["allowance(address,address)"](owner.wallet.address, otherAccount.wallet.address)
+            const ctAllowance = await contract["allowance(address,address)"](owner.address, otherAccount.address)
 
-            const allowance = owner.decryptUint(ctAllowance[1])
+            const allowance = await owner.decryptValue(ctAllowance[1])
 
             await expect(allowance).to.equal(value)
         })

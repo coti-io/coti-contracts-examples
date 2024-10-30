@@ -44,7 +44,6 @@ export interface StringTestsContractInterface extends Interface {
       | "setIsEqual"
       | "setNetworkEncryptedString"
       | "setPublicString"
-      | "setRandomString"
       | "setUserEncryptedString"
   ): FunctionFragment;
 
@@ -71,10 +70,6 @@ export interface StringTestsContractInterface extends Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "setRandomString",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "setUserEncryptedString",
     values: [ItStringStruct]
   ): string;
@@ -96,10 +91,6 @@ export interface StringTestsContractInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setPublicString",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setRandomString",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -177,8 +168,6 @@ export interface StringTestsContract extends BaseContract {
 
   setPublicString: TypedContractMethod<[str: string], [void], "nonpayable">;
 
-  setRandomString: TypedContractMethod<[], [void], "nonpayable">;
-
   setUserEncryptedString: TypedContractMethod<
     [it_: ItStringStruct],
     [void],
@@ -214,9 +203,6 @@ export interface StringTestsContract extends BaseContract {
   getFunction(
     nameOrSignature: "setPublicString"
   ): TypedContractMethod<[str: string], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "setRandomString"
-  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "setUserEncryptedString"
   ): TypedContractMethod<[it_: ItStringStruct], [void], "nonpayable">;
