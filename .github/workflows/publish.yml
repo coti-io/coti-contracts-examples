@@ -46,6 +46,7 @@ jobs:
   
   build-npm-package:
     needs: update-version
+    if: steps.update-version.outcome == 'success' || always()
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v3
