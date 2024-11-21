@@ -12,7 +12,6 @@ on:
 jobs:
   checkout:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/checkout@v4
 
