@@ -44,7 +44,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
-  build-npm-package:    
+  build-npm-package:
+    needs: update-version
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v3
@@ -55,6 +56,7 @@ jobs:
   
   publish-npm-package:
       needs: build-npm-package
+      if: startsWith(github.ref, 'refs/tags/')
       runs-on: ubuntu-latest
       steps:
       - run: npm publish --access=public
@@ -62,6 +64,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
   
   build-python-package:
+    needs: update-version
     runs-on: ubuntu-latest
     steps:
       - name: build release distributions
@@ -71,6 +74,7 @@ jobs:
 
   publish-python-package:
     needs: build-python-package
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - name: upload windows dists
