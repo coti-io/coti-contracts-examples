@@ -18,6 +18,8 @@ export type { PrivateERC20 } from "./@coti-io/coti-contracts/contracts/token/Pri
 export { PrivateERC20__factory } from "./factories/@coti-io/coti-contracts/contracts/token/PrivateERC20/PrivateERC20__factory";
 export type { PrivateERC721URIStorage } from "./@coti-io/coti-contracts/contracts/token/PrivateERC721/extensions/PrivateERC721URIStorage";
 export { PrivateERC721URIStorage__factory } from "./factories/@coti-io/coti-contracts/contracts/token/PrivateERC721/extensions/PrivateERC721URIStorage__factory";
+export type { IERC721Errors } from "./@coti-io/coti-contracts/contracts/token/PrivateERC721/IERC721Errors";
+export { IERC721Errors__factory } from "./factories/@coti-io/coti-contracts/contracts/token/PrivateERC721/IERC721Errors__factory";
 export type { PrivateERC721 } from "./@coti-io/coti-contracts/contracts/token/PrivateERC721/PrivateERC721";
 export { PrivateERC721__factory } from "./factories/@coti-io/coti-contracts/contracts/token/PrivateERC721/PrivateERC721__factory";
 export type { MpcCore } from "./@coti-io/coti-contracts/contracts/utils/mpc/MpcCore";
@@ -32,8 +34,6 @@ export type { IERC1155Errors } from "./@openzeppelin/contracts/interfaces/draft-
 export { IERC1155Errors__factory } from "./factories/@openzeppelin/contracts/interfaces/draft-IERC6093.sol/IERC1155Errors__factory";
 export type { IERC20Errors } from "./@openzeppelin/contracts/interfaces/draft-IERC6093.sol/IERC20Errors";
 export { IERC20Errors__factory } from "./factories/@openzeppelin/contracts/interfaces/draft-IERC6093.sol/IERC20Errors__factory";
-export type { IERC721Errors } from "./@openzeppelin/contracts/interfaces/draft-IERC6093.sol/IERC721Errors";
-export { IERC721Errors__factory } from "./factories/@openzeppelin/contracts/interfaces/draft-IERC6093.sol/IERC721Errors__factory";
 export type { IERC4906 } from "./@openzeppelin/contracts/interfaces/IERC4906";
 export { IERC4906__factory } from "./factories/@openzeppelin/contracts/interfaces/IERC4906__factory";
 export type { IERC721 } from "./@openzeppelin/contracts/token/ERC721/IERC721";

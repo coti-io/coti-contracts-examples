@@ -50,8 +50,8 @@ describe("Private Token", function () {
             await expect(await contract.symbol()).to.equal("PTOK");
         })
 
-        it('has 2 decimals', async function () {
-            await expect(await contract.decimals()).to.equal(2n);
+        it('has 6 decimals', async function () {
+            await expect(await contract.decimals()).to.equal(6n);
         })
     })
 

@@ -28,7 +28,7 @@ contract PrivateIdentityRegistry is Ownable2Step {
     event RemoveDid(address wallet);
     event Identifier(ctUint64 identifier);
 
-    constructor() Ownable(msg.sender) {}
+    constructor() Ownable() {}
 
     function addRegistrar(address wallet, uint registrarId) public onlyOwner {
         require(registrarId > 0, "registrarId needs to be > 0");
