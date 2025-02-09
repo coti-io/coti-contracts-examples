@@ -13,7 +13,7 @@ setup(
     author_email='dev@coti.io',
     url='https://github.com/coti-io/coti-contracts-examples',
     keywords=["coti", "privacy", "ethereum", "blockchain", "web3", "garbled-circuits", "l2", "on-chain-compute"],
-    version="0.1.0",
+    version='1.0.7',
     packages=find_namespace_packages(include=['artifacts.*']),
     include_package_data=True,
     package_data={
