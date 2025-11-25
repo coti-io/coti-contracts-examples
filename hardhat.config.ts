@@ -19,10 +19,18 @@ const config: HardhatUserConfig = {
     "coti-testnet": {
       url: "https://testnet.coti.io/rpc",
       chainId: 7082400,
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      timeout: 60000,
+      gas: "auto",
+      gasPrice: "auto",
     },
     "coti-mainnet": {
       url: "https://mainnet.coti.io/rpc",
       chainId: 2632500,
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      timeout: 60000,
+      gas: "auto",
+      gasPrice: "auto",
     },
   },
   mocha: {
