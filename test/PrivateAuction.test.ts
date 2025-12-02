@@ -1,6 +1,6 @@
 import hre from "hardhat"
 import { expect } from "chai"
-import { itUint, Wallet } from "@coti-io/coti-ethers"
+import { itUint256, Wallet } from "@coti-io/coti-ethers"
 import { setupAccounts } from "./utils/accounts"
 
 const gasLimit = 12000000
@@ -19,7 +19,7 @@ async function deploy() {
   await (
     await token
       .connect(owner)
-      .mint(owner.address, initialSupply)
+      .mint(owner.address, initialSupply, { gasLimit })
   ).wait()
 
   const factory = await hre.ethers.getContractFactory("PrivateAuction")
@@ -45,7 +45,7 @@ async function expectBalance(
   user: Wallet
 ) {
   const ctBalance = await token["balanceOf(address)"](user.address)
-  let balance = await user.decryptValue(ctBalance)
+  let balance = await user.decryptValue256(ctBalance)
   expect(balance).to.equal(amount)
 }
 
@@ -55,7 +55,7 @@ async function expectBid(
   user: Wallet
 ) {
   const ctBalance = await contract.connect(user).getBid.staticCall()
-  let bid = await user.decryptValue(ctBalance)
+  let bid = await user.decryptValue256(ctBalance)
   expect(bid).to.equal(amount)
 }
 
@@ -93,24 +93,24 @@ describe("Private Auction", function () {
     it(`Bid ${bidAmount}`, async function () {
       const { token, tokenAddress, contract, contractAddress, owner } = deployment
 
-      const initialBalance = Number(await owner.decryptValue(await token["balanceOf(address)"](owner.address)))
+      const initialBalance = Number(await owner.decryptValue256(await token["balanceOf(address)"](owner.address)))
 
-      let itBidAmount = await owner.encryptValue(
+      let itBidAmount = await owner.encryptValue256(
         bidAmount,
         tokenAddress,
-        token["approve(address,(uint256,bytes))"].fragment.selector
-      ) as itUint
+        token.interface.getFunction("approve(address,((uint256,uint256),bytes))").selector
+      ) as itUint256
 
       await (
         await token
           .connect(owner)
-          ["approve(address,(uint256,bytes))"]
+          .getFunction("approve(address,((uint256,uint256),bytes))")
           (contractAddress, itBidAmount, { gasLimit })
       ).wait()
 
       const func = contract.connect(owner).bid
       const selector = func.fragment.selector
-      itBidAmount = await owner.encryptValue(BigInt(bidAmount), contractAddress, selector) as itUint
+      itBidAmount = await owner.encryptValue256(BigInt(bidAmount), contractAddress, selector) as itUint256
       await (await func(itBidAmount, { gasLimit })).wait()
 
       await expectBalance(token, initialBalance - bidAmount, owner)
@@ -121,24 +121,24 @@ describe("Private Auction", function () {
     it(`Increase Bid ${bidAmount * 2}`, async function () {
       const { token, tokenAddress, contract, contractAddress, owner } = deployment
 
-      const initialBalance = Number(await owner.decryptValue(await token["balanceOf(address)"](owner.address)))
+      const initialBalance = Number(await owner.decryptValue256(await token["balanceOf(address)"](owner.address)))
 
-      let itBidAmount = await owner.encryptValue(
+      let itBidAmount = await owner.encryptValue256(
         bidAmount * 2,
         tokenAddress,
-        token["approve(address,(uint256,bytes))"].fragment.selector
-      ) as itUint
+        token.interface.getFunction("approve(address,((uint256,uint256),bytes))").selector
+      ) as itUint256
 
       await (
         await token
           .connect(owner)
-          ["approve(address,(uint256,bytes))"]
+          .getFunction("approve(address,((uint256,uint256),bytes))")
           (contractAddress, itBidAmount, { gasLimit })
       ).wait()
 
       const func = contract.connect(owner).bid
       const selector = func.fragment.selector
-      itBidAmount = await owner.encryptValue(BigInt(bidAmount * 2), contractAddress, selector) as itUint
+      itBidAmount = await owner.encryptValue256(BigInt(bidAmount * 2), contractAddress, selector) as itUint256
       await (await func(itBidAmount, { gasLimit })).wait()
 
       await expectBalance(token, initialBalance - bidAmount, owner)
