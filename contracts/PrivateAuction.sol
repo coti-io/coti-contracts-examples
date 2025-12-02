@@ -11,10 +11,10 @@ contract PrivateAuction {
     address public beneficiary;
 
     // Current highest bid.
-    ctUint64 internal highestBid;
+    ctUint256 internal highestBid;
 
     // Mapping from bidder to their bid value.
-    mapping(address => ctUint64) internal bids;
+    mapping(address => ctUint256) internal bids;
 
     // Number of bid
     uint public bidCounter;
@@ -63,13 +63,13 @@ contract PrivateAuction {
     }
 
     function bid(
-        itUint64 calldata itBid
+        itUint256 calldata itBid
     ) public onlyBeforeEnd {
-        ctUint64 existingBid = bids[msg.sender];
+        ctUint256 memory existingBid = bids[msg.sender];
 
-        gtUint64 gtBid = MpcCore.validateCiphertext(itBid);
+        gtUint256 gtBid = MpcCore.validateCiphertext(itBid);
 
-        if (ctUint64.unwrap(existingBid) == 0) {
+        if (ctUint128.unwrap(existingBid.ciphertextHigh) == 0 && ctUint128.unwrap(existingBid.ciphertextLow) == 0) {
             bidCounter++;
             bids[msg.sender] = MpcCore.offBoard(gtBid);
             tokenContract.transferFrom(
@@ -86,7 +86,7 @@ contract PrivateAuction {
             )
         ) {
             bids[msg.sender] = MpcCore.offBoard(gtBid);
-            gtUint64 toTransfer = MpcCore.sub(
+            gtUint256 toTransfer = MpcCore.sub(
                 gtBid,
                 MpcCore.onBoard(existingBid)
             );
@@ -96,9 +96,9 @@ contract PrivateAuction {
                 toTransfer
             );
         }
-        ctUint64 currentBid = bids[msg.sender];
+        ctUint256 memory currentBid = bids[msg.sender];
         if (
-            ctUint64.unwrap(highestBid) == 0 ||
+            (ctUint128.unwrap(highestBid.ciphertextHigh) == 0 && ctUint128.unwrap(highestBid.ciphertextLow) == 0) ||
             MpcCore.decrypt(
                 MpcCore.ge(
                     MpcCore.onBoard(existingBid),
@@ -110,8 +110,8 @@ contract PrivateAuction {
         }
     }
 
-    function getBid() public returns (ctUint64) {
-        gtUint64 bidGt = MpcCore.onBoard(bids[msg.sender]);
+    function getBid() public returns (ctUint256 memory) {
+        gtUint256 bidGt = MpcCore.onBoard(bids[msg.sender]);
         return MpcCore.offBoardToUser(bidGt, msg.sender);
     }
 
@@ -122,9 +122,10 @@ contract PrivateAuction {
 
     function doIHaveHighestBid() public {
         gtBool isHighest = MpcCore.setPublic(false);
+        ctUint256 memory userBid = bids[msg.sender];
         if (
-            ctUint64.unwrap(highestBid) != 0 &&
-            ctUint64.unwrap(bids[msg.sender]) != 0
+            !(ctUint128.unwrap(highestBid.ciphertextHigh) == 0 && ctUint128.unwrap(highestBid.ciphertextLow) == 0) &&
+            !(ctUint128.unwrap(userBid.ciphertextHigh) == 0 && ctUint128.unwrap(userBid.ciphertextLow) == 0)
         ) {
             isHighest = MpcCore.ge(
                 MpcCore.onBoard(bids[msg.sender]),
@@ -147,7 +148,7 @@ contract PrivateAuction {
         if (MpcCore.decrypt(canClaim)) {
             objectClaimed = MpcCore.offBoard(MpcCore.setPublic(true));
             bids[msg.sender] = MpcCore.offBoardToUser(
-                MpcCore.setPublic64(0),
+                MpcCore.setPublic256(0),
                 msg.sender
             );
             emit Winner(msg.sender);
@@ -166,7 +167,7 @@ contract PrivateAuction {
 
     // Withdraw a bid from the auction to the caller once the auction has stopped.
     function withdraw() public onlyAfterEnd {
-        gtUint64 bidValue = MpcCore.onBoard(bids[msg.sender]);
+        gtUint256 bidValue = MpcCore.onBoard(bids[msg.sender]);
         gtBool isHighestBid = MpcCore.ge(bidValue, MpcCore.onBoard(highestBid));
         gtBool canWithdraw = MpcCore.not(
             MpcCore.and(
@@ -176,7 +177,7 @@ contract PrivateAuction {
         );
         if (MpcCore.decrypt(canWithdraw)) {
             bids[msg.sender] = MpcCore.offBoardToUser(
-                MpcCore.setPublic64(0),
+                MpcCore.setPublic256(0),
                 msg.sender
             );
             tokenContract.transfer(msg.sender, bidValue);

@@ -6,7 +6,7 @@ import {PrivateERC20} from "@coti-io/coti-contracts/contracts/token/PrivateERC20
 import "@coti-io/coti-contracts/contracts/utils/mpc/MpcCore.sol";
 
 contract PrivateToken is PrivateERC20 {
-    uint64 private _totalSupply;
+    uint256 private _totalSupply;
 
     constructor(string memory name_, string memory symbol_) PrivateERC20(name_, symbol_) {}
 
@@ -14,16 +14,16 @@ contract PrivateToken is PrivateERC20 {
         return _totalSupply;
     }
 
-    function mint(address account, uint64 amount) external {
-        gtBool success = _mint(account, MpcCore.setPublic64(amount));
+    function mint(address account, uint256 amount) external {
+        gtBool success = _mint(account, MpcCore.setPublic256(amount));
 
         if (MpcCore.decrypt(success)) {
             _totalSupply += amount;
         }
     }
 
-    function burn(address account, uint64 amount) external {
-        gtBool success = _burn(account, MpcCore.setPublic64(amount));
+    function burn(address account, uint256 amount) external {
+        gtBool success = _burn(account, MpcCore.setPublic256(amount));
 
         if (MpcCore.decrypt(success)) {
             _totalSupply -= amount;
